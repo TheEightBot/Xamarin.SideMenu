@@ -52,11 +52,11 @@ namespace EightBot.BigBang.iOS.SideMenu
         {
             if (leftSide)
             {
-                SideMenuManager.menuLeftNavigationController = this;
+                SideMenuManager.LeftNavigationController = this;
             }
             else
             {
-                SideMenuManager.menuRightNavigationController = this;
+                SideMenuManager.RightNavigationController = this;
             }
         }
 
@@ -84,7 +84,7 @@ namespace EightBot.BigBang.iOS.SideMenu
                 var mainView = PresentingViewController?.View;
                 if (mainView != null)
                 {
-                    switch (SideMenuManager.menuPresentMode)
+                    switch (SideMenuManager.PresentMode)
                     {
                         case SideMenuManager.MenuPresentMode.ViewSlideOut:
                         case SideMenuManager.MenuPresentMode.ViewSlideInOut:
@@ -131,7 +131,7 @@ namespace EightBot.BigBang.iOS.SideMenu
 
         public override void PrepareForSegue(UIStoryboardSegue segue, NSObject sender)
         {
-            var menuViewController = SideMenuTransition.presentDirection == UIRectEdge.Left ? SideMenuManager.menuLeftNavigationController : SideMenuManager.menuRightNavigationController;
+            var menuViewController = SideMenuTransition.presentDirection == UIRectEdge.Left ? SideMenuManager.LeftNavigationController : SideMenuManager.RightNavigationController;
             if (menuViewController != null)
             {
                 var presentingViewController = menuViewController.PresentingViewController as UINavigationController;
@@ -142,7 +142,7 @@ namespace EightBot.BigBang.iOS.SideMenu
 
         public override bool ShouldPerformSegue(string segueIdentifier, NSObject sender)
         {
-            var menuViewController = SideMenuTransition.presentDirection == UIRectEdge.Left ? SideMenuManager.menuLeftNavigationController : SideMenuManager.menuRightNavigationController;
+            var menuViewController = SideMenuTransition.presentDirection == UIRectEdge.Left ? SideMenuManager.LeftNavigationController : SideMenuManager.RightNavigationController;
             if (menuViewController != null)
             {
                 var presentingViewController = menuViewController.PresentingViewController as UINavigationController;
@@ -180,9 +180,9 @@ namespace EightBot.BigBang.iOS.SideMenu
                 this.VisibleViewController?.ViewWillAppear(false); // Hack: force selection to get cleared on UITableViewControllers when reappearing using custom transitions
             };
 
-            UIView.Animate(SideMenuManager.menuAnimationDismissDuration, animation: () => SideMenuTransition.Current.hideMenuStart());
+            UIView.Animate(SideMenuManager.AnimationDismissDuration, animation: () => SideMenuTransition.Current.hideMenuStart());
 
-            if (SideMenuManager.menuAllowPopIfPossible)
+            if (SideMenuManager.AllowPopIfPossible)
             {
                 foreach (var subViewController in presentingViewController.ViewControllers)
                 {
@@ -196,7 +196,7 @@ namespace EightBot.BigBang.iOS.SideMenu
                 }
             }
 
-            if (!SideMenuManager.menuAllowPushOfSameClassTwice)
+            if (!SideMenuManager.AllowPushOfSameClassTwice)
             {
                 //TODO: Review this
                 if (presentingViewController.ViewControllers[presentingViewController.ViewControllers.Length - 1].GetType() == viewController.GetType()) //if presentingViewController.viewControllers.last?.dynamicType == viewController.dynamicType {

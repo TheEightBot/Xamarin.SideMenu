@@ -6,12 +6,12 @@ using UIKit;
 
 namespace EightBot.BigBang.iOS.SideMenu
 {
-    public static class SideMenuManager
+    public class SideMenuManager
     {
         /* Example usage:
             // Define the menus
-            SideMenuManager.menuLeftNavigationController = storyboard!.instantiateViewControllerWithIdentifier("LeftMenuNavigationController") as? UISideMenuNavigationController
-            SideMenuManager.menuRightNavigationController = storyboard!.instantiateViewControllerWithIdentifier("RightMenuNavigationController") as? UISideMenuNavigationController
+            SideMenuManager.LeftNavigationController = storyboard!.instantiateViewControllerWithIdentifier("LeftMenuNavigationController") as? UISideMenuNavigationController
+            SideMenuManager.RightNavigationController = storyboard!.instantiateViewControllerWithIdentifier("RightMenuNavigationController") as? UISideMenuNavigationController
             // Enable gestures. The left and/or right menus must be set up above for these to work.
             // Note that these continue to work on the Navigation Controller independent of the View Controller it displays!
             SideMenuManager.menuAddPanGestureToPresent(toView: self.navigationController!.navigationBar)
@@ -41,16 +41,16 @@ namespace EightBot.BigBang.iOS.SideMenu
          - ViewSlideInOut: The existing view slides out while the menu slides in.
          - MenuDissolveIn: The menu dissolves in over the existing view controller.
          */
-        public static MenuPresentMode menuPresentMode = MenuPresentMode.ViewSlideOut;
+        public static MenuPresentMode PresentMode = MenuPresentMode.ViewSlideOut;
 
         /// Prevents the same view controller (or a view controller of the same class) from being pushed more than once. Defaults to true.
-        public static bool menuAllowPushOfSameClassTwice = true;
+        public static bool AllowPushOfSameClassTwice = true;
 
         /// Pops to any view controller already in the navigation stack instead of the view controller being pushed if they share the same class. Defaults to false.
-        public static bool menuAllowPopIfPossible = false;
+        public static bool AllowPopIfPossible = false;
 
         /// Width of the menu when presented on screen, showing the existing view controller in the remaining space. Default is 75% of the screen width.
-        public static double menuWidth
+        public static double MenuWidth
         {
             get
             {
@@ -59,51 +59,51 @@ namespace EightBot.BigBang.iOS.SideMenu
         }
 
         /// Duration of the animation when the menu is presented without gestures. Default is 0.35 seconds.
-        public static double menuAnimationPresentDuration = 0.35;
+        public static double AnimationPresentDuration = 0.35;
 
         /// Duration of the animation when the menu is dismissed without gestures. Default is 0.35 seconds.
-        public static double menuAnimationDismissDuration = 0.35;
+        public static double AnimationDismissDuration = 0.35;
 
         /// Amount to fade the existing view controller when the menu is presented. Default is 0 for no fade. Set to 1 to fade completely.
-        public static double menuAnimationFadeStrength = 0;
+        public static double AnimationFadeStrength = 0;
 
         /// The amount to scale the existing view controller or the menu view controller depending on the `menuPresentMode`. Default is 1 for no scaling. Less than 1 will shrink, greater than 1 will grow.
-        public static double menuAnimationTransformScaleFactor = 1;
+        public static double AnimationTransformScaleFactor = 1;
 
         /// The background color behind menu animations. Depending on the animation settings this may not be visible. If `menuFadeStatusBar` is true, this color is used to fade it. Default is black.
-        public static UIColor menuAnimationBackgroundColor;
+        public static UIColor AnimationBackgroundColor;
 
         /// The shadow opacity around the menu view controller or existing view controller depending on the `menuPresentMode`. Default is 0.5 for 50% opacity.
-        public static double menuShadowOpacity = 0.5;
+        public static double ShadowOpacity = 0.5;
 
         /// The shadow color around the menu view controller or existing view controller depending on the `menuPresentMode`. Default is black.
-        public static UIColor menuShadowColor = UIColor.Black;
+        public static UIColor ShadowColor = UIColor.Black;
 
         /// The radius of the shadow around the menu view controller or existing view controller depending on the `menuPresentMode`. Default is 5.
-        public static double menuShadowRadius = 5;
+        public static double ShadowRadius = 5;
 
         /// The left menu swipe to dismiss gesture.
-        public static UIPanGestureRecognizer menuLeftSwipeToDismissGesture;
+        public static UIPanGestureRecognizer LeftSwipeToDismissGesture;
 
         /// The right menu swipe to dismiss gesture.
-        public static UIPanGestureRecognizer menuRightSwipeToDismissGesture;
+        public static UIPanGestureRecognizer RightSwipeToDismissGesture;
 
         /// The strength of the parallax effect on the existing view controller. Does not apply to `menuPresentMode` when set to `ViewSlideOut`. Default is 0.
-        public static int menuParallaxStrength = 0;
+        public static int ParallaxStrength = 0;
 
         /// Draws the `menuAnimationBackgroundColor` behind the status bar. Default is true.
-        public static bool menuFadeStatusBar = true;
+        public static bool FadeStatusBar = true;
 
         /// - Warning: Deprecated. Use `menuAnimationTransformScaleFactor` instead.
-        public static double menuAnimationShrinkStrength
+        public static double AnimationShrinkStrength
         {
             get
             {
-                return menuAnimationTransformScaleFactor;
+                return AnimationTransformScaleFactor;
             }
             set
             {
-                menuAnimationTransformScaleFactor = value;
+                AnimationTransformScaleFactor = value;
             }
         }
 
@@ -112,58 +112,58 @@ namespace EightBot.BigBang.iOS.SideMenu
          
          - Note: If you want cells in a UITableViewController menu to show vibrancy, make them a subclass of UITableViewVibrantCell.
          */
-        private static UIBlurEffectStyle _menuBlurEffectStyle;
-        public static UIBlurEffectStyle menuBlurEffectStyle {
-            get { return _menuBlurEffectStyle; }
+        private static UIBlurEffectStyle _blurEffectStyle;
+        public static UIBlurEffectStyle BlurEffectStyle {
+            get { return _blurEffectStyle; }
             set {
-                if (value != _menuBlurEffectStyle) {
-                    _menuBlurEffectStyle = value;
+                if (value != _blurEffectStyle) {
+                    _blurEffectStyle = value;
                     updateMenuBlurIfNecessary();
                 }
             }
         }
 
         /// The left menu.
-        private static UISideMenuNavigationController _menuLeftNavigationController;
-        public static UISideMenuNavigationController menuLeftNavigationController
+        private static UISideMenuNavigationController _leftNavigationController;
+        public static UISideMenuNavigationController LeftNavigationController
         {
-            get { return _menuLeftNavigationController; }
+            get { return _leftNavigationController; }
             set
             {
-                if (_menuLeftNavigationController?.PresentingViewController == null)
+                if (_leftNavigationController?.PresentingViewController == null)
                 {
-                    removeMenuBlurForMenu(_menuLeftNavigationController);
+                    removeMenuBlurForMenu(_leftNavigationController);
 
-                    _menuLeftNavigationController = value;
+                    _leftNavigationController = value;
 
-                    setupNavigationController(_menuLeftNavigationController, true);
+                    setupNavigationController(_leftNavigationController, true);
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("SideMenu Warning: menuLeftNavigationController cannot be modified while it's presented.");
+                    System.Diagnostics.Debug.WriteLine("SideMenu Warning: LeftNavigationController cannot be modified while it's presented.");
                     return;
                 }
             }
         }
 
         /// The right menu.
-        private static UISideMenuNavigationController _menuRightNavigationController;
-        public static UISideMenuNavigationController menuRightNavigationController
+        private static UISideMenuNavigationController _rightNavigationController;
+        public static UISideMenuNavigationController RightNavigationController
         {
-            get { return _menuRightNavigationController; }
+            get { return _rightNavigationController; }
             set
             {
-                if (_menuRightNavigationController?.PresentingViewController == null)
+                if (_rightNavigationController?.PresentingViewController == null)
                 {
-                    removeMenuBlurForMenu(_menuRightNavigationController);
+                    removeMenuBlurForMenu(_rightNavigationController);
 
-                    _menuRightNavigationController = value;
+                    _rightNavigationController = value;
 
-                    setupNavigationController(_menuRightNavigationController, false);
+                    setupNavigationController(_rightNavigationController, false);
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("SideMenu Warning: menuRightNavigationController cannot be modified while it's presented.");
+                    System.Diagnostics.Debug.WriteLine("SideMenu Warning: RightNavigationController cannot be modified while it's presented.");
                     return;
                 }
             }
@@ -182,22 +182,22 @@ namespace EightBot.BigBang.iOS.SideMenu
             forMenu.LeftSide = leftSide;
             if (leftSide)
             {
-                menuLeftSwipeToDismissGesture = exitPanGesture;
+                LeftSwipeToDismissGesture = exitPanGesture;
             }
             else
             {
-                menuRightSwipeToDismissGesture = exitPanGesture;
+                RightSwipeToDismissGesture = exitPanGesture;
             }
             updateMenuBlurIfNecessary();
         }
 
         private static void updateMenuBlurIfNecessary()
         {
-            if (menuLeftNavigationController != null)
-                setupMenuBlurForMenu(menuLeftNavigationController);
+            if (LeftNavigationController != null)
+                setupMenuBlurForMenu(LeftNavigationController);
 
-            if (menuRightNavigationController != null)
-                setupMenuBlurForMenu(menuRightNavigationController);
+            if (RightNavigationController != null)
+                setupMenuBlurForMenu(RightNavigationController);
         }
 
         private static void setupMenuBlurForMenu(UISideMenuNavigationController forMenu)
@@ -218,7 +218,7 @@ namespace EightBot.BigBang.iOS.SideMenu
                 forMenu.OriginalMenuBackgroundColor = view.BackgroundColor;
             }
 
-            var blurEffect = UIBlurEffect.FromStyle(menuBlurEffectStyle);
+            var blurEffect = UIBlurEffect.FromStyle(BlurEffectStyle);
             var blurView = new UIVisualEffectView(blurEffect);
             view.BackgroundColor = UIColor.Clear;
             var tableViewController = forMenu.VisibleViewController as UITableViewController;
@@ -275,7 +275,7 @@ namespace EightBot.BigBang.iOS.SideMenu
 
          - Returns: The array of screen edge gestures added to `toView`.
          */
-        public static List<UIScreenEdgePanGestureRecognizer> menuAddScreenEdgePanGesturesToPresent(UIView toView, UIRectEdge? forMenu = null) {
+        public static List<UIScreenEdgePanGestureRecognizer> AddScreenEdgePanGesturesToPresent(UIView toView, UIRectEdge? forMenu = null) {
             var gestures = new List<UIScreenEdgePanGestureRecognizer>();
 
             if (forMenu != UIRectEdge.Right)
@@ -308,7 +308,7 @@ namespace EightBot.BigBang.iOS.SideMenu
          
          - Returns: The pan gesture added to `toView`.
          */
-        public static UIPanGestureRecognizer menuAddPanGestureToPresent(UIView toView)
+        public static UIPanGestureRecognizer AddPanGestureToPresent(UIView toView)
         {
             var panGestureRecognizer = new UIPanGestureRecognizer();
             panGestureRecognizer.AddTarget(/*SideMenuTransition.self, */() => SideMenuTransition.Current.handlePresentMenuPan(panGestureRecognizer));

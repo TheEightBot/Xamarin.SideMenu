@@ -58,9 +58,9 @@ namespace EightBot.BigBang.iOS.SideMenu
         {
             get
             {
-                return SideMenuManager.menuLeftNavigationController?.PresentingViewController != null
-                    ? SideMenuManager.menuLeftNavigationController?.PresentingViewController
-                    : SideMenuManager.menuRightNavigationController?.PresentingViewController;
+                return SideMenuManager.LeftNavigationController?.PresentingViewController != null
+                    ? SideMenuManager.LeftNavigationController?.PresentingViewController
+                    : SideMenuManager.RightNavigationController?.PresentingViewController;
             }
         }
 
@@ -126,8 +126,8 @@ namespace EightBot.BigBang.iOS.SideMenu
                 }
 
                 var menuViewController = SideMenuTransition.presentDirection == UIRectEdge.Left
-                    ? SideMenuManager.menuLeftNavigationController
-                    : SideMenuManager.menuRightNavigationController;
+                    ? SideMenuManager.LeftNavigationController
+                    : SideMenuManager.RightNavigationController;
                 if (menuViewController != null && visibleViewController != null)
                 {
                     interactive = true;
@@ -136,7 +136,7 @@ namespace EightBot.BigBang.iOS.SideMenu
             }
 
             var direction = SideMenuTransition.presentDirection == UIRectEdge.Left ? 1 : -1;
-            var distance = translation.X / SideMenuManager.menuWidth;
+            var distance = translation.X / SideMenuManager.MenuWidth;
             // now lets deal with different states that the gesture recognizer sends
             switch (pan.State)
             {
@@ -145,12 +145,12 @@ namespace EightBot.BigBang.iOS.SideMenu
                     if (pan is UIScreenEdgePanGestureRecognizer) {
                         this.UpdateInteractiveTransition((float)Math.Min(distance * direction, 1));
                     }
-                    else if (distance > 0 && SideMenuTransition.presentDirection == UIRectEdge.Right && SideMenuManager.menuLeftNavigationController != null) {
+                    else if (distance > 0 && SideMenuTransition.presentDirection == UIRectEdge.Right && SideMenuManager.LeftNavigationController != null) {
                         SideMenuTransition.presentDirection = UIRectEdge.Left;
                         switchMenus = true;
                         this.CancelInteractiveTransition();
                     }
-                    else if (distance < 0 && SideMenuTransition.presentDirection == UIRectEdge.Left && SideMenuManager.menuRightNavigationController != null) {
+                    else if (distance < 0 && SideMenuTransition.presentDirection == UIRectEdge.Left && SideMenuManager.RightNavigationController != null) {
                         SideMenuTransition.presentDirection = UIRectEdge.Right;
                         switchMenus = true;
                         this.CancelInteractiveTransition();
@@ -187,7 +187,7 @@ namespace EightBot.BigBang.iOS.SideMenu
         {
             var translation = pan.TranslationInView(pan.View);
             var direction = SideMenuTransition.presentDirection == UIRectEdge.Left ? -1 : 1;
-            var distance = translation.X / SideMenuManager.menuWidth * direction;
+            var distance = translation.X / SideMenuManager.MenuWidth * direction;
             
             switch (pan.State)
             {
@@ -230,7 +230,7 @@ namespace EightBot.BigBang.iOS.SideMenu
                 NSNotificationCenter.DefaultCenter.RemoveObserver(menuObserver);
 
             var mainViewController = SideMenuTransition.Current.viewControllerForPresentedMenu;
-            var menuView = SideMenuTransition.presentDirection == UIRectEdge.Left ? SideMenuManager.menuLeftNavigationController?.View : SideMenuManager.menuRightNavigationController?.View;
+            var menuView = SideMenuTransition.presentDirection == UIRectEdge.Left ? SideMenuManager.LeftNavigationController?.View : SideMenuManager.RightNavigationController?.View;
             if (mainViewController == null || menuView == null)
                 return;
 
@@ -240,7 +240,7 @@ namespace EightBot.BigBang.iOS.SideMenu
             SideMenuTransition.tapView.Frame = new CGRect(0, 0, mainViewController.View.Frame.Width, mainViewController.View.Frame.Height);
             var frame = menuView.Frame;
             frame.Y = 0;
-            frame.Size = new CGSize(SideMenuManager.menuWidth, mainViewController.View.Frame.Height);
+            frame.Size = new CGSize(SideMenuManager.MenuWidth, mainViewController.View.Frame.Height);
             menuView.Frame = frame;
             if (SideMenuTransition.statusBarView != null)
             {
@@ -250,20 +250,20 @@ namespace EightBot.BigBang.iOS.SideMenu
 
             CGRect menuFrame;
             CGRect viewFrame;
-            switch (SideMenuManager.menuPresentMode)
+            switch (SideMenuManager.PresentMode)
             {
                 case SideMenuManager.MenuPresentMode.ViewSlideOut:
-                    menuView.Alpha = 1 - (float)SideMenuManager.menuAnimationFadeStrength;
+                    menuView.Alpha = 1 - (float)SideMenuManager.AnimationFadeStrength;
 
                     menuFrame = menuView.Frame;
-                    menuFrame.X = (float)(SideMenuTransition.presentDirection == UIRectEdge.Left ? 0 : mainViewController.View.Frame.Width - SideMenuManager.menuWidth);
+                    menuFrame.X = (float)(SideMenuTransition.presentDirection == UIRectEdge.Left ? 0 : mainViewController.View.Frame.Width - SideMenuManager.MenuWidth);
                     menuView.Frame = menuFrame;
 
                     viewFrame = mainViewController.View.Frame;
                     viewFrame.X = 0;
                     mainViewController.View.Frame = viewFrame;
 
-                    menuView.Transform = CGAffineTransform.MakeScale((float)SideMenuManager.menuAnimationTransformScaleFactor, (float)SideMenuManager.menuAnimationTransformScaleFactor);
+                    menuView.Transform = CGAffineTransform.MakeScale((float)SideMenuManager.AnimationTransformScaleFactor, (float)SideMenuManager.AnimationTransformScaleFactor);
                     break;
 
                 case SideMenuManager.MenuPresentMode.ViewSlideInOut:
@@ -290,7 +290,7 @@ namespace EightBot.BigBang.iOS.SideMenu
                     menuView.Alpha = 0;
 
                     menuFrame = menuView.Frame;
-                    menuFrame.X = (float)(SideMenuTransition.presentDirection == UIRectEdge.Left ? 0 : mainViewController.View.Frame.Width - SideMenuManager.menuWidth);
+                    menuFrame.X = (float)(SideMenuTransition.presentDirection == UIRectEdge.Left ? 0 : mainViewController.View.Frame.Width - SideMenuManager.MenuWidth);
                     menuView.Frame = menuFrame;
 
                     viewFrame = mainViewController.View.Frame;
@@ -303,7 +303,7 @@ namespace EightBot.BigBang.iOS.SideMenu
         public void hideMenuComplete()
         {
             var mainViewController = SideMenuTransition.Current.viewControllerForPresentedMenu;
-            var menuView = SideMenuTransition.presentDirection == UIRectEdge.Left ? SideMenuManager.menuLeftNavigationController?.View : SideMenuManager.menuRightNavigationController?.View;
+            var menuView = SideMenuTransition.presentDirection == UIRectEdge.Left ? SideMenuManager.LeftNavigationController?.View : SideMenuManager.RightNavigationController?.View;
             if (mainViewController == null || menuView == null)
             {
                 return;
@@ -328,7 +328,7 @@ namespace EightBot.BigBang.iOS.SideMenu
             if (size == null)
                 size = SideMenuManager.appScreenRect.Size;
 
-            var menuView = SideMenuTransition.presentDirection == UIRectEdge.Left ? SideMenuManager.menuLeftNavigationController?.View : SideMenuManager.menuRightNavigationController?.View;
+            var menuView = SideMenuTransition.presentDirection == UIRectEdge.Left ? SideMenuManager.LeftNavigationController?.View : SideMenuManager.RightNavigationController?.View;
             var mainViewController = SideMenuTransition.Current.viewControllerForPresentedMenu;
             if (menuView == null || mainViewController == null)
                 return;
@@ -336,8 +336,8 @@ namespace EightBot.BigBang.iOS.SideMenu
             menuView.Transform = CGAffineTransform.MakeIdentity();
             mainViewController.View.Transform = CGAffineTransform.MakeIdentity();
             var menuFrame = menuView.Frame;
-            menuFrame.Size = new CGSize(SideMenuManager.menuWidth, size.Value.Height);
-            menuFrame.X = (float)(SideMenuTransition.presentDirection == UIRectEdge.Left ? 0 : size.Value.Width - SideMenuManager.menuWidth);
+            menuFrame.Size = new CGSize(SideMenuManager.MenuWidth, size.Value.Height);
+            menuFrame.X = (float)(SideMenuTransition.presentDirection == UIRectEdge.Left ? 0 : size.Value.Width - SideMenuManager.MenuWidth);
             menuView.Frame = menuFrame;
 
             if (SideMenuTransition.statusBarView != null)
@@ -348,7 +348,7 @@ namespace EightBot.BigBang.iOS.SideMenu
 
             int direction = 0;
             CGRect frame;
-            switch (SideMenuManager.menuPresentMode)
+            switch (SideMenuManager.PresentMode)
             {
                 case SideMenuManager.MenuPresentMode.ViewSlideOut:
                     menuView.Alpha = 1;
@@ -356,36 +356,36 @@ namespace EightBot.BigBang.iOS.SideMenu
                     frame = mainViewController.View.Frame;
                     frame.X = direction * (menuView.Frame.Width);
                     mainViewController.View.Frame = frame;
-                    mainViewController.View.Layer.ShadowColor = SideMenuManager.menuShadowColor.CGColor;
-                    mainViewController.View.Layer.ShadowRadius = (float)SideMenuManager.menuShadowRadius;
-                    mainViewController.View.Layer.ShadowOpacity = (float)SideMenuManager.menuShadowOpacity;
+                    mainViewController.View.Layer.ShadowColor = SideMenuManager.ShadowColor.CGColor;
+                    mainViewController.View.Layer.ShadowRadius = (float)SideMenuManager.ShadowRadius;
+                    mainViewController.View.Layer.ShadowOpacity = (float)SideMenuManager.ShadowOpacity;
                     mainViewController.View.Layer.ShadowOffset = new CGSize(0, 0);
                     break;
 
                 case SideMenuManager.MenuPresentMode.ViewSlideInOut:
                     menuView.Alpha = 1;
-                    menuView.Layer.ShadowColor = SideMenuManager.menuShadowColor.CGColor;
-                    menuView.Layer.ShadowRadius = (float)SideMenuManager.menuShadowRadius;
-                    menuView.Layer.ShadowOpacity = (float)SideMenuManager.menuShadowOpacity;
+                    menuView.Layer.ShadowColor = SideMenuManager.ShadowColor.CGColor;
+                    menuView.Layer.ShadowRadius = (float)SideMenuManager.ShadowRadius;
+                    menuView.Layer.ShadowOpacity = (float)SideMenuManager.ShadowOpacity;
                     menuView.Layer.ShadowOffset = new CGSize(0, 0);
                     direction = SideMenuTransition.presentDirection == UIRectEdge.Left ? 1 : -1;
                     frame = mainViewController.View.Frame;
                     frame.X = direction * (menuView.Frame.Width);
                     mainViewController.View.Frame = frame;
-                    mainViewController.View.Transform = CGAffineTransform.MakeScale((float)SideMenuManager.menuAnimationTransformScaleFactor, (float)SideMenuManager.menuAnimationTransformScaleFactor);
-                    mainViewController.View.Alpha = (float)(1 - SideMenuManager.menuAnimationFadeStrength);
+                    mainViewController.View.Transform = CGAffineTransform.MakeScale((float)SideMenuManager.AnimationTransformScaleFactor, (float)SideMenuManager.AnimationTransformScaleFactor);
+                    mainViewController.View.Alpha = (float)(1 - SideMenuManager.AnimationFadeStrength);
                     break;
 
                 case SideMenuManager.MenuPresentMode.MenuSlideIn:
                 case SideMenuManager.MenuPresentMode.MenuDissolveIn:
                     menuView.Alpha = 1;
-                    menuView.Layer.ShadowColor = SideMenuManager.menuShadowColor.CGColor;
-                    menuView.Layer.ShadowRadius = (float)SideMenuManager.menuShadowRadius;
-                    menuView.Layer.ShadowOpacity = (float)SideMenuManager.menuShadowOpacity;
+                    menuView.Layer.ShadowColor = SideMenuManager.ShadowColor.CGColor;
+                    menuView.Layer.ShadowRadius = (float)SideMenuManager.ShadowRadius;
+                    menuView.Layer.ShadowOpacity = (float)SideMenuManager.ShadowOpacity;
                     menuView.Layer.ShadowOffset = new CGSize(0, 0);
                     mainViewController.View.Frame = new CGRect(0, 0, size.Value.Width, size.Value.Height);
-                    mainViewController.View.Transform = CGAffineTransform.MakeScale((float)SideMenuManager.menuAnimationTransformScaleFactor, (float)SideMenuManager.menuAnimationTransformScaleFactor);
-                    mainViewController.View.Alpha = (float)(1 - SideMenuManager.menuAnimationFadeStrength);
+                    mainViewController.View.Transform = CGAffineTransform.MakeScale((float)SideMenuManager.AnimationTransformScaleFactor, (float)SideMenuManager.AnimationTransformScaleFactor);
+                    mainViewController.View.Alpha = (float)(1 - SideMenuManager.AnimationFadeStrength);
                     break;
             }
         }
@@ -400,18 +400,18 @@ namespace EightBot.BigBang.iOS.SideMenu
             if (mainViewController == null)
                 return;
 
-            switch (SideMenuManager.menuPresentMode) {
+            switch (SideMenuManager.PresentMode) {
                 case SideMenuManager.MenuPresentMode.MenuSlideIn:
                 case SideMenuManager.MenuPresentMode.MenuDissolveIn:
                 case SideMenuManager.MenuPresentMode.ViewSlideInOut:
-                    if (SideMenuManager.menuParallaxStrength != 0) {
+                    if (SideMenuManager.ParallaxStrength != 0) {
                         var horizontal = new UIInterpolatingMotionEffect(keyPath: "center.x", type: UIInterpolatingMotionEffectType.TiltAlongHorizontalAxis);
-                        horizontal.MinimumRelativeValue = NSNumber.FromInt32(-SideMenuManager.menuParallaxStrength);
-                        horizontal.MinimumRelativeValue = NSNumber.FromInt32(SideMenuManager.menuParallaxStrength);
+                        horizontal.MinimumRelativeValue = NSNumber.FromInt32(-SideMenuManager.ParallaxStrength);
+                        horizontal.MinimumRelativeValue = NSNumber.FromInt32(SideMenuManager.ParallaxStrength);
 
                         var vertical = new UIInterpolatingMotionEffect(keyPath: "center.y", type: UIInterpolatingMotionEffectType.TiltAlongVerticalAxis);
-                        vertical.MinimumRelativeValue = NSNumber.FromInt32(- SideMenuManager.menuParallaxStrength);
-                        vertical.MaximumRelativeValue = NSNumber.FromInt32(SideMenuManager.menuParallaxStrength);
+                        vertical.MinimumRelativeValue = NSNumber.FromInt32(- SideMenuManager.ParallaxStrength);
+                        vertical.MaximumRelativeValue = NSNumber.FromInt32(SideMenuManager.ParallaxStrength);
 
                         var group = new UIMotionEffectGroup();
                         group.MotionEffects = new UIMotionEffect[] { horizontal, vertical };
@@ -437,7 +437,7 @@ namespace EightBot.BigBang.iOS.SideMenu
             {
                 // get reference to our fromView, toView and the container view that we should perform the transition in
                 var container = transitionContext.ContainerView;
-                var menuBackgroundColor = SideMenuManager.menuAnimationBackgroundColor;
+                var menuBackgroundColor = SideMenuManager.AnimationBackgroundColor;
                 if (menuBackgroundColor != null)
                 {
                     container.BackgroundColor = menuBackgroundColor;
@@ -474,7 +474,7 @@ namespace EightBot.BigBang.iOS.SideMenu
                     SideMenuTransition.originalSuperview = topView.Superview;
 
                     // add the both views to our view controller
-                    switch (SideMenuManager.menuPresentMode)
+                    switch (SideMenuManager.PresentMode)
                     {
                         case SideMenuManager.MenuPresentMode.ViewSlideOut:
                             container.AddSubview(menuView);
@@ -490,10 +490,10 @@ namespace EightBot.BigBang.iOS.SideMenu
                             break;
                     }
 
-                    if (SideMenuManager.menuFadeStatusBar)
+                    if (SideMenuManager.FadeStatusBar)
                     {
                         var blackBar = new UIView();
-                        var menuShrinkBackgroundColor = SideMenuManager.menuAnimationBackgroundColor;
+                        var menuShrinkBackgroundColor = SideMenuManager.AnimationBackgroundColor;
                         if (menuShrinkBackgroundColor != null)
                         {
                             blackBar.BackgroundColor = menuShrinkBackgroundColor;
@@ -551,8 +551,8 @@ namespace EightBot.BigBang.iOS.SideMenu
                                 SideMenuTransition.switchMenus = false;
                                 viewControllerForPresentedMenu?.PresentViewController(
                                     SideMenuTransition.presentDirection == UIRectEdge.Left
-                                        ? SideMenuManager.menuLeftNavigationController
-                                        : SideMenuManager.menuRightNavigationController,
+                                        ? SideMenuManager.LeftNavigationController
+                                        : SideMenuManager.RightNavigationController,
                                     true, null);
                             }
 
@@ -564,7 +564,7 @@ namespace EightBot.BigBang.iOS.SideMenu
                             SideMenuTransition.Current.presentMenuComplete();
                             menuView.UserInteractionEnabled = true;
                             transitionContext.CompleteTransition(true);
-                            switch (SideMenuManager.menuPresentMode)
+                            switch (SideMenuManager.PresentMode)
                             {
                                 case SideMenuManager.MenuPresentMode.ViewSlideOut:
                                     container.AddSubview(topView);
@@ -593,7 +593,7 @@ namespace EightBot.BigBang.iOS.SideMenu
             // return how many seconds the transiton animation will take
             public override double TransitionDuration(IUIViewControllerContextTransitioning transitionContext)
             {
-                return SideMenuTransition.presenting ? SideMenuManager.menuAnimationPresentDuration : SideMenuManager.menuAnimationDismissDuration;
+                return SideMenuTransition.presenting ? SideMenuManager.AnimationPresentDuration : SideMenuManager.AnimationDismissDuration;
             }
         }
 
@@ -607,7 +607,7 @@ namespace EightBot.BigBang.iOS.SideMenu
             public override IUIViewControllerAnimatedTransitioning GetAnimationControllerForPresentedController(UIViewController presented, UIViewController presentingViewController, UIViewController source)
             {
                 presenting = true;
-                presentDirection = presented == SideMenuManager.menuLeftNavigationController ? UIRectEdge.Left : UIRectEdge.Right;
+                presentDirection = presented == SideMenuManager.LeftNavigationController ? UIRectEdge.Left : UIRectEdge.Right;
                 return SideMenuTransition.Current.AnimatedTransitioning;
             }
 
@@ -633,7 +633,7 @@ namespace EightBot.BigBang.iOS.SideMenu
 
             public void applicationDidEnterBackgroundNotification()
             {
-                var menuViewController = SideMenuTransition.presentDirection == UIRectEdge.Left ? SideMenuManager.menuLeftNavigationController : SideMenuManager.menuRightNavigationController;
+                var menuViewController = SideMenuTransition.presentDirection == UIRectEdge.Left ? SideMenuManager.LeftNavigationController : SideMenuManager.RightNavigationController;
                 if (menuViewController != null)
                 {
                     SideMenuTransition.Current.hideMenuStart();
