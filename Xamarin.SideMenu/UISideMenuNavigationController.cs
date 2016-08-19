@@ -6,13 +6,28 @@ using Foundation;
 using UIKit;
 using CoreAnimation;
 
-namespace EightBot.BigBang.iOS.SideMenu
+namespace Xamarin.SideMenu
 {
     public class UISideMenuNavigationController : UINavigationController
     {
-        public UISideMenuNavigationController(UIViewController rootViewController) : base (rootViewController)
-        {
+        public SideMenuManager SideMenuManager { get; set;}
+        
+        public bool LeftSide { get; set; }
 
+        public UISideMenuNavigationController(SideMenuManager sideMenuManager, UIViewController rootViewController, bool leftSide = true) : base (rootViewController)
+        {
+            SideMenuManager = sideMenuManager;
+
+            LeftSide = leftSide;
+
+            if (LeftSide)
+            {
+                SideMenuManager.LeftNavigationController = this;
+            }
+            else
+            {
+                SideMenuManager.RightNavigationController = this;
+            }
         }
 
         public UIColor OriginalMenuBackgroundColor { get; set; }
@@ -27,37 +42,9 @@ namespace EightBot.BigBang.iOS.SideMenu
             this.ModalPresentationStyle = UIModalPresentationStyle.OverFullScreen;
         }
 
-        /// Whether the menu appears on the right or left side of the screen. Right is the default.
-        private bool leftSide = false;
-        public bool LeftSide
-        {
-            get { return leftSide; }
-            set
-            {
-                if (this.IsViewLoaded && value != leftSide)
-                {
-                    DidSetSide();
-                }
-            }
-        }
-
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
-
-            DidSetSide();
-        }
-
-        private void DidSetSide()
-        {
-            if (leftSide)
-            {
-                SideMenuManager.LeftNavigationController = this;
-            }
-            else
-            {
-                SideMenuManager.RightNavigationController = this;
-            }
         }
 
         public override void ViewDidAppear(bool animated)
@@ -67,7 +54,7 @@ namespace EightBot.BigBang.iOS.SideMenu
             // we had presented a view before, so lets dismiss ourselves as already acted upon
             if (this.View.Hidden)
             {
-                SideMenuTransition.Current.hideMenuComplete();
+                SideMenuManager.SideMenuTransition.hideMenuComplete();
                 DismissViewController(false, () => this.View.Hidden = false);
             }
         }
@@ -92,7 +79,7 @@ namespace EightBot.BigBang.iOS.SideMenu
                             break;
                         case SideMenuManager.MenuPresentMode.MenuSlideIn:
                         case SideMenuManager.MenuPresentMode.MenuDissolveIn:
-                            mainView.Superview?.InsertSubviewAbove(View, SideMenuTransition.tapView);
+                            mainView.Superview?.InsertSubviewAbove(View, SideMenuManager.SideMenuTransition.tapView);
                             break;
                     }
                 }
@@ -106,7 +93,7 @@ namespace EightBot.BigBang.iOS.SideMenu
             if (!IsBeingDismissed)
             {
                 View.Hidden = true;
-                SideMenuTransition.Current.hideMenuStart();
+                SideMenuManager.SideMenuTransition.hideMenuStart();
             }
         }
 
@@ -120,18 +107,18 @@ namespace EightBot.BigBang.iOS.SideMenu
                 return;
             }
 
-            if (SideMenuTransition.statusBarView != null)
+            if (SideMenuManager.SideMenuTransition.statusBarView != null)
             {
-                SideMenuTransition.statusBarView.Hidden = true;
+                SideMenuManager.SideMenuTransition.statusBarView.Hidden = true;
                 coordinator.AnimateAlongsideTransition(
-                    (_) => SideMenuTransition.Current.presentMenuStart(toSize),
-                    (_) => SideMenuTransition.statusBarView.Hidden = false);
+                    (_) => SideMenuManager.SideMenuTransition.presentMenuStart(toSize),
+                    (_) => SideMenuManager.SideMenuTransition.statusBarView.Hidden = false);
             }
         }
 
         public override void PrepareForSegue(UIStoryboardSegue segue, NSObject sender)
         {
-            var menuViewController = SideMenuTransition.presentDirection == UIRectEdge.Left ? SideMenuManager.LeftNavigationController : SideMenuManager.RightNavigationController;
+            var menuViewController = SideMenuManager.SideMenuTransition.presentDirection == UIRectEdge.Left ? SideMenuManager.LeftNavigationController : SideMenuManager.RightNavigationController;
             if (menuViewController != null)
             {
                 var presentingViewController = menuViewController.PresentingViewController as UINavigationController;
@@ -142,7 +129,7 @@ namespace EightBot.BigBang.iOS.SideMenu
 
         public override bool ShouldPerformSegue(string segueIdentifier, NSObject sender)
         {
-            var menuViewController = SideMenuTransition.presentDirection == UIRectEdge.Left ? SideMenuManager.LeftNavigationController : SideMenuManager.RightNavigationController;
+            var menuViewController = SideMenuManager.SideMenuTransition.presentDirection == UIRectEdge.Left ? SideMenuManager.LeftNavigationController : SideMenuManager.RightNavigationController;
             if (menuViewController != null)
             {
                 var presentingViewController = menuViewController.PresentingViewController as UINavigationController;
@@ -180,7 +167,7 @@ namespace EightBot.BigBang.iOS.SideMenu
                 this.VisibleViewController?.ViewWillAppear(false); // Hack: force selection to get cleared on UITableViewControllers when reappearing using custom transitions
             };
 
-            UIView.Animate(SideMenuManager.AnimationDismissDuration, animation: () => SideMenuTransition.Current.hideMenuStart());
+            UIView.Animate(SideMenuManager.AnimationDismissDuration, animation: () => SideMenuManager.SideMenuTransition.hideMenuStart());
 
             if (SideMenuManager.AllowPopIfPossible)
             {
