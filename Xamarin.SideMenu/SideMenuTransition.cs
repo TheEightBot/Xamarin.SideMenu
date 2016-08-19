@@ -55,9 +55,9 @@ namespace Xamarin.SideMenu
         private UIView originalSuperview;
         private bool switchMenus = false;
 
-        public UIRectEdge presentDirection = UIRectEdge.Left;
-        public UIView tapView;
-        public UIView statusBarView;
+        public UIRectEdge PresentDirection = UIRectEdge.Left;
+        public UIView TapView;
+        public UIView StatusBarView;
 
         UIViewController viewControllerForPresentedMenu
         {
@@ -94,19 +94,19 @@ namespace Xamarin.SideMenu
             return viewController;
         }
 
-        public void handlePresentMenuLeftScreenEdge(UIScreenEdgePanGestureRecognizer edge)
+        public void HandlePresentMenuLeftScreenEdge(UIScreenEdgePanGestureRecognizer edge)
         {
-            this.presentDirection = UIRectEdge.Left;
-            handlePresentMenuPan(edge);
+            this.PresentDirection = UIRectEdge.Left;
+            HandlePresentMenuPan(edge);
         }
 
-        public void handlePresentMenuRightScreenEdge(UIScreenEdgePanGestureRecognizer edge)
+        public void HandlePresentMenuRightScreenEdge(UIScreenEdgePanGestureRecognizer edge)
         {
-            this.presentDirection = UIRectEdge.Right;
-            handlePresentMenuPan(edge);
+            this.PresentDirection = UIRectEdge.Right;
+            HandlePresentMenuPan(edge);
         }
 
-        public void handlePresentMenuPan(UIPanGestureRecognizer pan)
+        public void HandlePresentMenuPan(UIPanGestureRecognizer pan)
         {
             // how much distance have we panned in reference to the parent view?
             var view = viewControllerForPresentedMenu != null ? viewControllerForPresentedMenu?.View : pan.View;
@@ -127,10 +127,10 @@ namespace Xamarin.SideMenu
                 }
 
                 if (!(pan is UIScreenEdgePanGestureRecognizer)) {
-                    this.presentDirection = translation.X > 0 ? UIRectEdge.Left : UIRectEdge.Right;
+                    this.PresentDirection = translation.X > 0 ? UIRectEdge.Left : UIRectEdge.Right;
                 }
 
-                var menuViewController = this.presentDirection == UIRectEdge.Left
+                var menuViewController = this.PresentDirection == UIRectEdge.Left
                     ? SideMenuManager.LeftNavigationController
                     : SideMenuManager.RightNavigationController;
                 if (menuViewController != null && visibleViewController != null)
@@ -140,7 +140,7 @@ namespace Xamarin.SideMenu
                 }
             }
 
-            var direction = this.presentDirection == UIRectEdge.Left ? 1 : -1;
+            var direction = this.PresentDirection == UIRectEdge.Left ? 1 : -1;
             var distance = translation.X / SideMenuManager.MenuWidth;
             // now lets deal with different states that the gesture recognizer sends
             switch (pan.State)
@@ -150,13 +150,13 @@ namespace Xamarin.SideMenu
                     if (pan is UIScreenEdgePanGestureRecognizer) {
                         this.UpdateInteractiveTransition((float)Math.Min(distance * direction, 1));
                     }
-                    else if (distance > 0 && this.presentDirection == UIRectEdge.Right && SideMenuManager.LeftNavigationController != null) {
-                        this.presentDirection = UIRectEdge.Left;
+                    else if (distance > 0 && this.PresentDirection == UIRectEdge.Right && SideMenuManager.LeftNavigationController != null) {
+                        this.PresentDirection = UIRectEdge.Left;
                         switchMenus = true;
                         this.CancelInteractiveTransition();
                     }
-                    else if (distance < 0 && this.presentDirection == UIRectEdge.Left && SideMenuManager.RightNavigationController != null) {
-                        this.presentDirection = UIRectEdge.Right;
+                    else if (distance < 0 && this.PresentDirection == UIRectEdge.Left && SideMenuManager.RightNavigationController != null) {
+                        this.PresentDirection = UIRectEdge.Right;
                         switchMenus = true;
                         this.CancelInteractiveTransition();
                     }
@@ -188,10 +188,10 @@ namespace Xamarin.SideMenu
             }
         }
 
-        public void handleHideMenuPan(UIPanGestureRecognizer pan)
+        public void HandleHideMenuPan(UIPanGestureRecognizer pan)
         {
             var translation = pan.TranslationInView(pan.View);
-            var direction = this.presentDirection == UIRectEdge.Left ? -1 : 1;
+            var direction = this.PresentDirection == UIRectEdge.Left ? -1 : 1;
             var distance = translation.X / SideMenuManager.MenuWidth * direction;
             
             switch (pan.State)
@@ -229,28 +229,28 @@ namespace Xamarin.SideMenu
             viewControllerForPresentedMenu?.DismissViewController(true, null);
         }
 
-        public void hideMenuStart()
+        public void HideMenuStart()
         {
             if(menuObserver != null)
                 NSNotificationCenter.DefaultCenter.RemoveObserver(menuObserver);
 
             var mainViewController = this.viewControllerForPresentedMenu;
-            var menuView = this.presentDirection == UIRectEdge.Left ? SideMenuManager.LeftNavigationController?.View : SideMenuManager.RightNavigationController?.View;
+            var menuView = this.PresentDirection == UIRectEdge.Left ? SideMenuManager.LeftNavigationController?.View : SideMenuManager.RightNavigationController?.View;
             if (mainViewController == null || menuView == null)
                 return;
 
             menuView.Transform = CGAffineTransform.MakeIdentity();
             mainViewController.View.Transform = CGAffineTransform.MakeIdentity();
             mainViewController.View.Alpha = 1;
-            this.tapView.Frame = new CGRect(0, 0, mainViewController.View.Frame.Width, mainViewController.View.Frame.Height);
+            this.TapView.Frame = new CGRect(0, 0, mainViewController.View.Frame.Width, mainViewController.View.Frame.Height);
             var frame = menuView.Frame;
             frame.Y = 0;
             frame.Size = new CGSize(SideMenuManager.MenuWidth, mainViewController.View.Frame.Height);
             menuView.Frame = frame;
-            if (this.statusBarView != null)
+            if (this.StatusBarView != null)
             {
-                this.statusBarView.Frame = UIApplication.SharedApplication.StatusBarFrame;
-                this.statusBarView.Alpha = 0;
+                this.StatusBarView.Frame = UIApplication.SharedApplication.StatusBarFrame;
+                this.StatusBarView.Alpha = 0;
             }
 
             CGRect menuFrame;
@@ -261,7 +261,7 @@ namespace Xamarin.SideMenu
                     menuView.Alpha = 1 - (float)SideMenuManager.AnimationFadeStrength;
 
                     menuFrame = menuView.Frame;
-                    menuFrame.X = (float)(this.presentDirection == UIRectEdge.Left ? 0 : mainViewController.View.Frame.Width - SideMenuManager.MenuWidth);
+                    menuFrame.X = (float)(this.PresentDirection == UIRectEdge.Left ? 0 : mainViewController.View.Frame.Width - SideMenuManager.MenuWidth);
                     menuView.Frame = menuFrame;
 
                     viewFrame = mainViewController.View.Frame;
@@ -275,7 +275,7 @@ namespace Xamarin.SideMenu
                     menuView.Alpha = 1;
 
                     menuFrame = menuView.Frame;
-                    menuFrame.X = this.presentDirection == UIRectEdge.Left ? -menuView.Frame.Width : mainViewController.View.Frame.Width;
+                    menuFrame.X = this.PresentDirection == UIRectEdge.Left ? -menuView.Frame.Width : mainViewController.View.Frame.Width;
                     menuView.Frame = menuFrame;
 
                     viewFrame = mainViewController.View.Frame;
@@ -287,7 +287,7 @@ namespace Xamarin.SideMenu
                     menuView.Alpha = 1;
 
                     menuFrame = menuView.Frame;
-                    menuFrame.X = this.presentDirection == UIRectEdge.Left ? -menuView.Frame.Width : mainViewController.View.Frame.Width;
+                    menuFrame.X = this.PresentDirection == UIRectEdge.Left ? -menuView.Frame.Width : mainViewController.View.Frame.Width;
                     menuView.Frame = menuFrame;
                     break;
 
@@ -295,7 +295,7 @@ namespace Xamarin.SideMenu
                     menuView.Alpha = 0;
 
                     menuFrame = menuView.Frame;
-                    menuFrame.X = (float)(this.presentDirection == UIRectEdge.Left ? 0 : mainViewController.View.Frame.Width - SideMenuManager.MenuWidth);
+                    menuFrame.X = (float)(this.PresentDirection == UIRectEdge.Left ? 0 : mainViewController.View.Frame.Width - SideMenuManager.MenuWidth);
                     menuView.Frame = menuFrame;
 
                     viewFrame = mainViewController.View.Frame;
@@ -305,17 +305,17 @@ namespace Xamarin.SideMenu
             }
         }
 
-        public void hideMenuComplete()
+        public void HideMenuComplete()
         {
             var mainViewController = this.viewControllerForPresentedMenu;
-            var menuView = this.presentDirection == UIRectEdge.Left ? SideMenuManager.LeftNavigationController?.View : SideMenuManager.RightNavigationController?.View;
+            var menuView = this.PresentDirection == UIRectEdge.Left ? SideMenuManager.LeftNavigationController?.View : SideMenuManager.RightNavigationController?.View;
             if (mainViewController == null || menuView == null)
             {
                 return;
             }
 
-            this.tapView.RemoveFromSuperview();
-            this.statusBarView?.RemoveFromSuperview();
+            this.TapView.RemoveFromSuperview();
+            this.StatusBarView?.RemoveFromSuperview();
             mainViewController.View.MotionEffects = new List<UIMotionEffect>().ToArray();
             mainViewController.View.Layer.ShadowOpacity = 0;
             menuView.Layer.ShadowOpacity = 0;
@@ -328,12 +328,12 @@ namespace Xamarin.SideMenu
             originalSuperview?.AddSubview(mainViewController.View);
         }
 
-        public void presentMenuStart(CGSize? size = null)
+        public void PresentMenuStart(CGSize? size = null)
         {
             if (size == null)
                 size = SideMenuManager.appScreenRect.Size;
 
-            var menuView = this.presentDirection == UIRectEdge.Left ? SideMenuManager.LeftNavigationController?.View : SideMenuManager.RightNavigationController?.View;
+            var menuView = this.PresentDirection == UIRectEdge.Left ? SideMenuManager.LeftNavigationController?.View : SideMenuManager.RightNavigationController?.View;
             var mainViewController = this.viewControllerForPresentedMenu;
             if (menuView == null || mainViewController == null)
                 return;
@@ -342,13 +342,13 @@ namespace Xamarin.SideMenu
             mainViewController.View.Transform = CGAffineTransform.MakeIdentity();
             var menuFrame = menuView.Frame;
             menuFrame.Size = new CGSize(SideMenuManager.MenuWidth, size.Value.Height);
-            menuFrame.X = (float)(this.presentDirection == UIRectEdge.Left ? 0 : size.Value.Width - SideMenuManager.MenuWidth);
+            menuFrame.X = (float)(this.PresentDirection == UIRectEdge.Left ? 0 : size.Value.Width - SideMenuManager.MenuWidth);
             menuView.Frame = menuFrame;
 
-            if (this.statusBarView != null)
+            if (this.StatusBarView != null)
             {
-                this.statusBarView.Frame = UIApplication.SharedApplication.StatusBarFrame;
-                this.statusBarView.Alpha = 1;
+                this.StatusBarView.Frame = UIApplication.SharedApplication.StatusBarFrame;
+                this.StatusBarView.Alpha = 1;
             }
 
             int direction = 0;
@@ -357,7 +357,7 @@ namespace Xamarin.SideMenu
             {
                 case SideMenuManager.MenuPresentMode.ViewSlideOut:
                     menuView.Alpha = 1;
-                    direction = this.presentDirection == UIRectEdge.Left ? 1 : -1;
+                    direction = this.PresentDirection == UIRectEdge.Left ? 1 : -1;
                     frame = mainViewController.View.Frame;
                     frame.X = direction * (menuView.Frame.Width);
                     mainViewController.View.Frame = frame;
@@ -373,7 +373,7 @@ namespace Xamarin.SideMenu
                     menuView.Layer.ShadowRadius = (float)SideMenuManager.ShadowRadius;
                     menuView.Layer.ShadowOpacity = (float)SideMenuManager.ShadowOpacity;
                     menuView.Layer.ShadowOffset = new CGSize(0, 0);
-                    direction = this.presentDirection == UIRectEdge.Left ? 1 : -1;
+                    direction = this.PresentDirection == UIRectEdge.Left ? 1 : -1;
                     frame = mainViewController.View.Frame;
                     frame.X = direction * (menuView.Frame.Width);
                     mainViewController.View.Frame = frame;
@@ -399,7 +399,7 @@ namespace Xamarin.SideMenu
         void presentMenuComplete()
         {
             //TODO: Review this
-            menuObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIApplication.DidEnterBackgroundNotification, (_) => TransitioningDelegate.applicationDidEnterBackgroundNotification());
+            menuObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIApplication.DidEnterBackgroundNotification, (_) => TransitioningDelegate.ApplicationDidEnterBackgroundNotification());
 
             var mainViewController = this.viewControllerForPresentedMenu;
             if (mainViewController == null)
@@ -485,12 +485,12 @@ namespace Xamarin.SideMenu
                     var tapView = new UIView();
                     tapView.AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth;
                     var exitPanGesture = new UIPanGestureRecognizer();
-                    exitPanGesture.AddTarget(/*SideMenuTransition.Current, */() => _sideMenuTransition.handleHideMenuPan(exitPanGesture));
+                    exitPanGesture.AddTarget(/*SideMenuTransition.Current, */() => _sideMenuTransition.HandleHideMenuPan(exitPanGesture));
                     var exitTapGesture = new UITapGestureRecognizer();
                     exitTapGesture.AddTarget(/*SideMenuTransition.Current, */() => _sideMenuTransition.handleHideMenuTap(exitTapGesture));
                     tapView.AddGestureRecognizer(exitPanGesture);
                     tapView.AddGestureRecognizer(exitTapGesture);
-                    _sideMenuTransition.tapView = tapView;
+                    _sideMenuTransition.TapView = tapView;
 
                     _sideMenuTransition.originalSuperview = topView.Superview;
 
@@ -525,10 +525,10 @@ namespace Xamarin.SideMenu
                         }
                         blackBar.UserInteractionEnabled = false;
                         container.AddSubview(blackBar);
-                        _sideMenuTransition.statusBarView = blackBar;
+                        _sideMenuTransition.StatusBarView = blackBar;
                     }
 
-                    _sideMenuTransition.hideMenuStart(); // offstage for interactive
+                    _sideMenuTransition.HideMenuStart(); // offstage for interactive
                 }
 
                 // perform the animation!
@@ -539,11 +539,11 @@ namespace Xamarin.SideMenu
                     {
                         if (_sideMenuTransition.presenting)
                         {
-                            _sideMenuTransition.presentMenuStart(); // onstage items: slide in
+                            _sideMenuTransition.PresentMenuStart(); // onstage items: slide in
                     }
                         else
                         {
-                            _sideMenuTransition.hideMenuStart();
+                            _sideMenuTransition.HideMenuStart();
                         }
                         menuView.UserInteractionEnabled = false;
                     },
@@ -556,7 +556,7 @@ namespace Xamarin.SideMenu
 
                             if (_sideMenuTransition.presenting)
                             {
-                                _sideMenuTransition.hideMenuComplete();
+                                _sideMenuTransition.HideMenuComplete();
                             }
                             else
                             {
@@ -571,7 +571,7 @@ namespace Xamarin.SideMenu
                             {
                                 _sideMenuTransition.switchMenus = false;
                                 viewControllerForPresentedMenu?.PresentViewController(
-                                    _sideMenuTransition.presentDirection == UIRectEdge.Left
+                                    _sideMenuTransition.PresentDirection == UIRectEdge.Left
                                         ? _sideMenuTransition.SideMenuManager.LeftNavigationController
                                         : _sideMenuTransition.SideMenuManager.RightNavigationController,
                                     true, null);
@@ -597,7 +597,7 @@ namespace Xamarin.SideMenu
                                     break;
                             }
 
-                            var statusBarView = _sideMenuTransition.statusBarView;
+                            var statusBarView = _sideMenuTransition.StatusBarView;
                             if (statusBarView != null)
                             {
                                 container.BringSubviewToFront(statusBarView);
@@ -605,7 +605,7 @@ namespace Xamarin.SideMenu
                             return;
                         }
 
-                        _sideMenuTransition.hideMenuComplete();
+                        _sideMenuTransition.HideMenuComplete();
                         transitionContext.CompleteTransition(true);
                         menuView.RemoveFromSuperview();
                     });
@@ -644,7 +644,7 @@ namespace Xamarin.SideMenu
             public override IUIViewControllerAnimatedTransitioning GetAnimationControllerForPresentedController(UIViewController presented, UIViewController presentingViewController, UIViewController source)
             {
                 _sideMenuTransition.presenting = true;
-                _sideMenuTransition.presentDirection = presented == _sideMenuTransition.SideMenuManager.LeftNavigationController ? UIRectEdge.Left : UIRectEdge.Right;
+                _sideMenuTransition.PresentDirection = presented == _sideMenuTransition.SideMenuManager.LeftNavigationController ? UIRectEdge.Left : UIRectEdge.Right;
                 return _sideMenuTransition.AnimatedTransitioning;
             }
 
@@ -668,13 +668,13 @@ namespace Xamarin.SideMenu
                 return null;// interactive ? SideMenuTransition.Current : null;
             }
 
-            public void applicationDidEnterBackgroundNotification()
+            public void ApplicationDidEnterBackgroundNotification()
             {
-                var menuViewController = _sideMenuTransition.presentDirection == UIRectEdge.Left ? _sideMenuTransition.SideMenuManager.LeftNavigationController : _sideMenuTransition.SideMenuManager.RightNavigationController;
+                var menuViewController = _sideMenuTransition.PresentDirection == UIRectEdge.Left ? _sideMenuTransition.SideMenuManager.LeftNavigationController : _sideMenuTransition.SideMenuManager.RightNavigationController;
                 if (menuViewController != null)
                 {
-                    _sideMenuTransition.hideMenuStart();
-                    _sideMenuTransition.hideMenuComplete();
+                    _sideMenuTransition.HideMenuStart();
+                    _sideMenuTransition.HideMenuComplete();
                     menuViewController.DismissViewController(false, null);
                 }
             }

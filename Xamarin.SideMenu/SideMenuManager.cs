@@ -183,7 +183,7 @@ namespace Xamarin.SideMenu
                 return;
 
             var exitPanGesture = new UIPanGestureRecognizer();
-            exitPanGesture.AddTarget(/*SideMenuTransition.self, */ () => SideMenuTransition.handleHideMenuPan(exitPanGesture));
+            exitPanGesture.AddTarget(/*SideMenuTransition.self, */ () => SideMenuTransition.HandleHideMenuPan(exitPanGesture));
             forMenu.View.AddGestureRecognizer(exitPanGesture);
             forMenu.TransitioningDelegate = SideMenuTransition.TransitioningDelegate;
             forMenu.ModalPresentationStyle = UIModalPresentationStyle.OverFullScreen;
@@ -289,7 +289,7 @@ namespace Xamarin.SideMenu
             if (forMenu != UIRectEdge.Right)
             {
                 var leftScreenEdgeGestureRecognizer = new UIScreenEdgePanGestureRecognizer();
-                leftScreenEdgeGestureRecognizer.AddTarget(/*SideMenuTransition.Current, */ (_) => SideMenuTransition.handlePresentMenuLeftScreenEdge(leftScreenEdgeGestureRecognizer));
+                leftScreenEdgeGestureRecognizer.AddTarget(/*SideMenuTransition.Current, */ (_) => SideMenuTransition.HandlePresentMenuLeftScreenEdge(leftScreenEdgeGestureRecognizer));
                 leftScreenEdgeGestureRecognizer.Edges = UIRectEdge.Left;
                 leftScreenEdgeGestureRecognizer.CancelsTouchesInView = true;
                 toView.AddGestureRecognizer(leftScreenEdgeGestureRecognizer);
@@ -299,7 +299,7 @@ namespace Xamarin.SideMenu
             if (forMenu != UIRectEdge.Left)
             {
                 var rightScreenEdgeGestureRecognizer = new UIScreenEdgePanGestureRecognizer();
-                rightScreenEdgeGestureRecognizer.AddTarget(/*SideMenuTransition.Current, */ (_) => SideMenuTransition.handlePresentMenuRightScreenEdge(rightScreenEdgeGestureRecognizer));
+                rightScreenEdgeGestureRecognizer.AddTarget(/*SideMenuTransition.Current, */ (_) => SideMenuTransition.HandlePresentMenuRightScreenEdge(rightScreenEdgeGestureRecognizer));
                 rightScreenEdgeGestureRecognizer.Edges = UIRectEdge.Right;
                 rightScreenEdgeGestureRecognizer.CancelsTouchesInView = true;
                 toView.AddGestureRecognizer(rightScreenEdgeGestureRecognizer);
@@ -319,7 +319,7 @@ namespace Xamarin.SideMenu
         public UIPanGestureRecognizer AddPanGestureToPresent(UIView toView)
         {
             var panGestureRecognizer = new UIPanGestureRecognizer();
-            panGestureRecognizer.AddTarget(/*SideMenuTransition.self, */() => SideMenuTransition.handlePresentMenuPan(panGestureRecognizer));
+            panGestureRecognizer.AddTarget(/*SideMenuTransition.self, */() => SideMenuTransition.HandlePresentMenuPan(panGestureRecognizer));
             toView.AddGestureRecognizer(panGestureRecognizer);
 
             return panGestureRecognizer;

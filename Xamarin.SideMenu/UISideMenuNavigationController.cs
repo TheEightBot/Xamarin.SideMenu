@@ -54,7 +54,7 @@ namespace Xamarin.SideMenu
             // we had presented a view before, so lets dismiss ourselves as already acted upon
             if (this.View.Hidden)
             {
-                SideMenuManager.SideMenuTransition.hideMenuComplete();
+                SideMenuManager.SideMenuTransition.HideMenuComplete();
                 DismissViewController(false, () => this.View.Hidden = false);
             }
         }
@@ -79,7 +79,7 @@ namespace Xamarin.SideMenu
                             break;
                         case SideMenuManager.MenuPresentMode.MenuSlideIn:
                         case SideMenuManager.MenuPresentMode.MenuDissolveIn:
-                            mainView.Superview?.InsertSubviewAbove(View, SideMenuManager.SideMenuTransition.tapView);
+                            mainView.Superview?.InsertSubviewAbove(View, SideMenuManager.SideMenuTransition.TapView);
                             break;
                     }
                 }
@@ -93,7 +93,7 @@ namespace Xamarin.SideMenu
             if (!IsBeingDismissed)
             {
                 View.Hidden = true;
-                SideMenuManager.SideMenuTransition.hideMenuStart();
+                SideMenuManager.SideMenuTransition.HideMenuStart();
             }
         }
 
@@ -107,18 +107,18 @@ namespace Xamarin.SideMenu
                 return;
             }
 
-            if (SideMenuManager.SideMenuTransition.statusBarView != null)
+            if (SideMenuManager.SideMenuTransition.StatusBarView != null)
             {
-                SideMenuManager.SideMenuTransition.statusBarView.Hidden = true;
+                SideMenuManager.SideMenuTransition.StatusBarView.Hidden = true;
                 coordinator.AnimateAlongsideTransition(
-                    (_) => SideMenuManager.SideMenuTransition.presentMenuStart(toSize),
-                    (_) => SideMenuManager.SideMenuTransition.statusBarView.Hidden = false);
+                    (_) => SideMenuManager.SideMenuTransition.PresentMenuStart(toSize),
+                    (_) => SideMenuManager.SideMenuTransition.StatusBarView.Hidden = false);
             }
         }
 
         public override void PrepareForSegue(UIStoryboardSegue segue, NSObject sender)
         {
-            var menuViewController = SideMenuManager.SideMenuTransition.presentDirection == UIRectEdge.Left ? SideMenuManager.LeftNavigationController : SideMenuManager.RightNavigationController;
+            var menuViewController = SideMenuManager.SideMenuTransition.PresentDirection == UIRectEdge.Left ? SideMenuManager.LeftNavigationController : SideMenuManager.RightNavigationController;
             if (menuViewController != null)
             {
                 var presentingViewController = menuViewController.PresentingViewController as UINavigationController;
@@ -129,7 +129,7 @@ namespace Xamarin.SideMenu
 
         public override bool ShouldPerformSegue(string segueIdentifier, NSObject sender)
         {
-            var menuViewController = SideMenuManager.SideMenuTransition.presentDirection == UIRectEdge.Left ? SideMenuManager.LeftNavigationController : SideMenuManager.RightNavigationController;
+            var menuViewController = SideMenuManager.SideMenuTransition.PresentDirection == UIRectEdge.Left ? SideMenuManager.LeftNavigationController : SideMenuManager.RightNavigationController;
             if (menuViewController != null)
             {
                 var presentingViewController = menuViewController.PresentingViewController as UINavigationController;
@@ -167,7 +167,7 @@ namespace Xamarin.SideMenu
                 this.VisibleViewController?.ViewWillAppear(false); // Hack: force selection to get cleared on UITableViewControllers when reappearing using custom transitions
             };
 
-            UIView.Animate(SideMenuManager.AnimationDismissDuration, animation: () => SideMenuManager.SideMenuTransition.hideMenuStart());
+            UIView.Animate(SideMenuManager.AnimationDismissDuration, animation: () => SideMenuManager.SideMenuTransition.HideMenuStart());
 
             if (SideMenuManager.AllowPopIfPossible)
             {
