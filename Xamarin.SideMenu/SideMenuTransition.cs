@@ -96,14 +96,14 @@ namespace Xamarin.SideMenu
 
         public void HandlePresentMenuLeftScreenEdge(UIScreenEdgePanGestureRecognizer edge)
         {
-            this.PresentDirection = UIRectEdge.Left;
-            HandlePresentMenuPan(edge);
+			this.PresentDirection = UIRectEdge.Left;
+			HandlePresentMenuPan(edge);
         }
 
         public void HandlePresentMenuRightScreenEdge(UIScreenEdgePanGestureRecognizer edge)
         {
-            this.PresentDirection = UIRectEdge.Right;
-            HandlePresentMenuPan(edge);
+			this.PresentDirection = UIRectEdge.Right;
+			HandlePresentMenuPan(edge);
         }
 
         public void HandlePresentMenuPan(UIPanGestureRecognizer pan)
