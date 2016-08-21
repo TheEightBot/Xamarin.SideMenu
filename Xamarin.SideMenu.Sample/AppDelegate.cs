@@ -22,13 +22,23 @@ namespace Xamarin.SideMenu.Sample
             // create a new window instance based on the screen size
             Window = new UIWindow(UIScreen.MainScreen.Bounds);
 
+			var spacePurple = UIColor.FromRGB(64, 0, 128);
+
+			UIView.Appearance.TintColor = spacePurple;
+			UISlider.Appearance.ThumbTintColor = spacePurple;
+			UISwitch.Appearance.TintColor = spacePurple;
+			UISwitch.Appearance.OnTintColor = spacePurple;
+			UINavigationBar.Appearance.BarTintColor = spacePurple;
+			UIBarButtonItem.Appearance.TintColor = UIColor.White;
+
             var controller = new UIViewController();
             controller.View.BackgroundColor = UIColor.LightGray;
             controller.Title = "My Controller";
 
             var cvc = new SideMenuSample();
 
-            var navController = new UINavigationController(cvc);
+			var navController = new UINavigationController(cvc) { };
+			navController.NavigationBar.BarStyle = UIBarStyle.Black;
 
             Window.RootViewController = navController;
 
