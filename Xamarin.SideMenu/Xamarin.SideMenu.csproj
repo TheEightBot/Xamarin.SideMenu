@@ -45,6 +45,7 @@
     <Compile Include="SideMenuManager.cs" />
     <Compile Include="SideMenuTransition.cs" />
     <Compile Include="UISideMenuNavigationController.cs" />
+    <Compile Include="UITableViewVibrantCell.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>
