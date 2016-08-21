@@ -91,6 +91,7 @@
     <None Include="Info.plist" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <InterfaceDefinition Include="Resources\LaunchScreen.xib" />
+    <Compile Include="SampleTableView.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

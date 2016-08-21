@@ -41,7 +41,7 @@ namespace Xamarin.SideMenu.Sample
             _sideMenuManager = new SideMenuManager();
 
             View.BackgroundColor = UIColor.White;
-            Title = "Swipe Here";
+            Title = "Side Menu";
 
 			var menuPresentMode = new UILabel { 
 				Text = "Menu Present Mode",
@@ -472,7 +472,7 @@ namespace Xamarin.SideMenu.Sample
 						_menuFadeStatusBar, NSLayoutAttribute.CenterY,
 						NSLayoutRelation.Equal,
 						menuFadeStatusBar, NSLayoutAttribute.CenterY,
-						1f, padding),
+						1f, 0f),
                   	NSLayoutConstraint.Create(
 						_menuFadeStatusBar, NSLayoutAttribute.Trailing,
 						NSLayoutRelation.Equal,
@@ -482,16 +482,18 @@ namespace Xamarin.SideMenu.Sample
 			);
 
 			SetupSideMenu();
+
+			SetDefaults();
         }
 
 		void SetupSideMenu()
 		{
-			_sideMenuManager.LeftNavigationController = new UISideMenuNavigationController(_sideMenuManager, new UITableViewController(), leftSide: true);
-			_sideMenuManager.RightNavigationController = new UISideMenuNavigationController(_sideMenuManager, new UITableViewController(), leftSide: false);
+			_sideMenuManager.LeftNavigationController = new UISideMenuNavigationController(_sideMenuManager, new SampleTableView(), leftSide: true);
+			_sideMenuManager.RightNavigationController = new UISideMenuNavigationController(_sideMenuManager, new SampleTableView(), leftSide: false);
 
 			// Enable gestures. The left and/or right menus must be set up above for these to work.
 			// Note that these continue to work on the Navigation Controller independent of the View Controller it displays!
-			_sideMenuManager.AddPanGestureToPresent(toView: this.NavigationController?.NavigationBar);
+			//_sideMenuManager.AddPanGestureToPresent(toView: this.NavigationController?.NavigationBar);
 
 			_sideMenuManager.AddScreenEdgePanGesturesToPresent(toView: this.NavigationController?.View);
 
@@ -499,29 +501,13 @@ namespace Xamarin.SideMenu.Sample
 			_sideMenuManager.AnimationBackgroundColor = UIColor.FromPatternImage(UIImage.FromFile("stars.png"));
 		}
 
-//		void SetDefaults()
-//		{
-//			let modes:[SideMenuManager.MenuPresentMode] = [.MenuSlideIn, .ViewSlideOut, .MenuDissolveIn]
-//		presentModeSegmentedControl.selectedSegmentIndex = modes.indexOf(SideMenuManager.menuPresentMode)!
-        
-//        let styles:[UIBlurEffectStyle] = [.Dark, .Light, .ExtraLight]
-//        if let menuBlurEffectStyle = SideMenuManager.menuBlurEffectStyle {
-
-//			blurSegmentControl.selectedSegmentIndex = styles.indexOf(menuBlurEffectStyle) ?? 0
-//        } else {
-//            blurSegmentControl.selectedSegmentIndex = 0
-//        }
-
-//darknessSlider.value = Float(SideMenuManager.menuAnimationFadeStrength)
-
-//		shadowOpacitySlider.value = Float(SideMenuManager.menuShadowOpacity)
-
-//		shrinkFactorSlider.value = Float(SideMenuManager.menuAnimationTransformScaleFactor)
-
-//		screenWidthSlider.value = Float(SideMenuManager.menuWidth / view.frame.width)
-
-//		blackOutStatusBar.on = SideMenuManager.menuFadeStatusBar
-//    }
+		void SetDefaults() {
+			_sideMenuManager.BlurEffectStyle = null;
+			_sideMenuManager.AnimationFadeStrength = _menuFadeStrength.Value;
+			_sideMenuManager.ShadowOpacity = _menuShadowOpacity.Value;
+			_sideMenuManager.AnimationTransformScaleFactor = _menuTransformScaleFactor.Value;
+			_sideMenuManager.FadeStatusBar = _menuFadeStatusBar.On;
+		}
 
         protected override void Dispose(bool disposing)
         {

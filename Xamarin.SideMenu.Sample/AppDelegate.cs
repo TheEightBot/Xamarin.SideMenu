@@ -29,7 +29,7 @@ namespace Xamarin.SideMenu.Sample
 			UISwitch.Appearance.TintColor = spacePurple;
 			UISwitch.Appearance.OnTintColor = spacePurple;
 			UINavigationBar.Appearance.BarTintColor = spacePurple;
-			UIBarButtonItem.Appearance.TintColor = UIColor.White;
+			UINavigationBar.Appearance.TintColor = UIColor.White;
 
             var controller = new UIViewController();
             controller.View.BackgroundColor = UIColor.LightGray;
