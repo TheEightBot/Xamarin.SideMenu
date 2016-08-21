@@ -26,7 +26,7 @@ namespace Xamarin.SideMenu
             base.Dispose(disposing);
         }
 
-        private SideMenuAnimatedTransitioning animatedTransitioning;
+        SideMenuAnimatedTransitioning animatedTransitioning;
         public SideMenuAnimatedTransitioning AnimatedTransitioning
         {
             get
@@ -38,7 +38,7 @@ namespace Xamarin.SideMenu
             }
         }
 
-        private SideMenuTransitioningDelegate transitioningDelegate;
+        SideMenuTransitioningDelegate transitioningDelegate;
         public SideMenuTransitioningDelegate TransitioningDelegate
         {
             get
@@ -50,10 +50,10 @@ namespace Xamarin.SideMenu
             }
         }
 
-        public bool presenting = false;
-        private bool interactive = false;
-        private UIView originalSuperview;
-        private bool switchMenus = false;
+		public bool Presenting { get; private set; }
+		bool interactive = false;
+        UIView originalSuperview;
+        bool switchMenus = false;
 
         public UIRectEdge PresentDirection = UIRectEdge.Left;
         public UIView TapView;
@@ -73,23 +73,23 @@ namespace Xamarin.SideMenu
         {
             get
             {
-                return getVisibleViewControllerFromViewController(UIApplication.SharedApplication.KeyWindow?.RootViewController);
+                return GetVisibleViewControllerFromViewController(UIApplication.SharedApplication.KeyWindow?.RootViewController);
             }
         }
 
-        private UIViewController getVisibleViewControllerFromViewController(UIViewController viewController)
+		UIViewController GetVisibleViewControllerFromViewController(UIViewController viewController)
         {
             var navigationController = viewController as UINavigationController;
             if (navigationController != null)
-                return getVisibleViewControllerFromViewController(navigationController.VisibleViewController);
+                return GetVisibleViewControllerFromViewController(navigationController.VisibleViewController);
 
             var tabBarController = viewController as UITabBarController;
             if (tabBarController != null)
-                return getVisibleViewControllerFromViewController(tabBarController.SelectedViewController);
+                return GetVisibleViewControllerFromViewController(tabBarController.SelectedViewController);
 
             var presentedViewController = viewController?.PresentedViewController;
             if (presentedViewController != null)
-                return getVisibleViewControllerFromViewController(presentedViewController);
+                return GetVisibleViewControllerFromViewController(presentedViewController);
 
             return viewController;
         }
@@ -224,7 +224,7 @@ namespace Xamarin.SideMenu
             }
         }
 
-        void handleHideMenuTap(UITapGestureRecognizer tap)
+		void HandleHideMenuTap(UITapGestureRecognizer tap)
         {
             viewControllerForPresentedMenu?.DismissViewController(true, null);
         }
@@ -437,7 +437,7 @@ namespace Xamarin.SideMenu
 
         public class SideMenuAnimatedTransitioning : UIViewControllerAnimatedTransitioning
         {
-            private SideMenuTransition _sideMenuTransition;
+            SideMenuTransition _sideMenuTransition;
             public SideMenuAnimatedTransitioning(SideMenuTransition sideMenuTransition)
             {
                 _sideMenuTransition = sideMenuTransition;
@@ -473,21 +473,21 @@ namespace Xamarin.SideMenu
 
                 // assign references to our menu view controller and the 'bottom' view controller from the tuple
                 // remember that our menuViewController will alternate between the from and to view controller depending if we're presenting or dismissing
-                var menuViewController = (!_sideMenuTransition.presenting ? screens.from : screens.to);
-                var topViewController = !_sideMenuTransition.presenting ? screens.to : screens.from;
+                var menuViewController = (!_sideMenuTransition.Presenting ? screens.from : screens.to);
+                var topViewController = !_sideMenuTransition.Presenting ? screens.to : screens.from;
 
                 var menuView = menuViewController.View;
                 var topView = topViewController.View;
 
                 // prepare menu items to slide in
-                if (_sideMenuTransition.presenting)
+                if (_sideMenuTransition.Presenting)
                 {
                     var tapView = new UIView();
                     tapView.AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth;
                     var exitPanGesture = new UIPanGestureRecognizer();
                     exitPanGesture.AddTarget(/*SideMenuTransition.Current, */() => _sideMenuTransition.HandleHideMenuPan(exitPanGesture));
                     var exitTapGesture = new UITapGestureRecognizer();
-                    exitTapGesture.AddTarget(/*SideMenuTransition.Current, */() => _sideMenuTransition.handleHideMenuTap(exitTapGesture));
+                    exitTapGesture.AddTarget(/*SideMenuTransition.Current, */() => _sideMenuTransition.HandleHideMenuTap(exitTapGesture));
                     tapView.AddGestureRecognizer(exitPanGesture);
                     tapView.AddGestureRecognizer(exitTapGesture);
                     _sideMenuTransition.TapView = tapView;
@@ -537,7 +537,7 @@ namespace Xamarin.SideMenu
                 UIView.Animate(duration, 0, options,
                     animation: () =>
                     {
-                        if (_sideMenuTransition.presenting)
+                        if (_sideMenuTransition.Presenting)
                         {
                             _sideMenuTransition.PresentMenuStart(); // onstage items: slide in
                     }
@@ -554,7 +554,7 @@ namespace Xamarin.SideMenu
                         {
                             var viewControllerForPresentedMenu = _sideMenuTransition.viewControllerForPresentedMenu;
 
-                            if (_sideMenuTransition.presenting)
+                            if (_sideMenuTransition.Presenting)
                             {
                                 _sideMenuTransition.HideMenuComplete();
                             }
@@ -580,7 +580,7 @@ namespace Xamarin.SideMenu
                             return;
                         }
 
-                        if (_sideMenuTransition.presenting)
+                        if (_sideMenuTransition.Presenting)
                         {
                             _sideMenuTransition.presentMenuComplete();
                             menuView.UserInteractionEnabled = true;
@@ -614,7 +614,7 @@ namespace Xamarin.SideMenu
             // return how many seconds the transiton animation will take
             public override double TransitionDuration(IUIViewControllerContextTransitioning transitionContext)
             {
-                return _sideMenuTransition.presenting ? _sideMenuTransition.SideMenuManager.AnimationPresentDuration : _sideMenuTransition.SideMenuManager.AnimationDismissDuration;
+                return _sideMenuTransition.Presenting ? _sideMenuTransition.SideMenuManager.AnimationPresentDuration : _sideMenuTransition.SideMenuManager.AnimationDismissDuration;
             }
         }
 
@@ -643,14 +643,14 @@ namespace Xamarin.SideMenu
             // rememeber that an animator (or animation controller) is any object that aheres to the UIViewControllerAnimatedTransitioning protocol
             public override IUIViewControllerAnimatedTransitioning GetAnimationControllerForPresentedController(UIViewController presented, UIViewController presentingViewController, UIViewController source)
             {
-                _sideMenuTransition.presenting = true;
+                _sideMenuTransition.Presenting = true;
                 _sideMenuTransition.PresentDirection = presented == _sideMenuTransition.SideMenuManager.LeftNavigationController ? UIRectEdge.Left : UIRectEdge.Right;
                 return _sideMenuTransition.AnimatedTransitioning;
             }
 
             public override IUIViewControllerAnimatedTransitioning GetAnimationControllerForDismissedController(UIViewController dismissed)
             {
-                _sideMenuTransition.presenting = false;
+                _sideMenuTransition.Presenting = false;
                 return _sideMenuTransition.AnimatedTransitioning;
             }
 
