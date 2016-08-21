@@ -57,13 +57,22 @@ namespace Xamarin.SideMenu
         /// Pops to any view controller already in the navigation stack instead of the view controller being pushed if they share the same class. Defaults to false.
         public bool AllowPopIfPossible = false;
 
+
+		double _menuWidth;
         /// Width of the menu when presented on screen, showing the existing view controller in the remaining space. Default is 75% of the screen width.
         public double MenuWidth
         {
             get
             {
-                return Math.Max(Math.Round(Math.Min((appScreenRect.Width), (appScreenRect.Height)) * 0.75), 240);
+				if(_menuWidth == default(double))
+					_menuWidth = Math.Max(Math.Round(Math.Min((appScreenRect.Width), (appScreenRect.Height)) * 0.75), 240);
+
+				return _menuWidth;
             }
+			set 
+			{
+				_menuWidth = value;
+			}
         }
 
         /// Duration of the animation when the menu is presented without gestures. Default is 0.35 seconds.
@@ -120,13 +129,13 @@ namespace Xamarin.SideMenu
          
          - Note: If you want cells in a UITableViewController menu to show vibrancy, make them a subclass of UITableViewVibrantCell.
          */
-        private UIBlurEffectStyle _blurEffectStyle;
-        public UIBlurEffectStyle BlurEffectStyle {
+        private UIBlurEffectStyle? _blurEffectStyle;
+        public UIBlurEffectStyle? BlurEffectStyle {
             get { return _blurEffectStyle; }
             set {
                 if (value != _blurEffectStyle) {
                     _blurEffectStyle = value;
-                    updateMenuBlurIfNecessary();
+                    UpdateMenuBlurIfNecessary();
                 }
             }
         }
@@ -140,11 +149,11 @@ namespace Xamarin.SideMenu
             {
                 if (_leftNavigationController?.PresentingViewController == null)
                 {
-                    removeMenuBlurForMenu(_leftNavigationController);
+                    RemoveMenuBlurForMenu(_leftNavigationController);
 
                     _leftNavigationController = value;
 
-                    setupNavigationController(_leftNavigationController, true);
+                    SetupNavigationController(_leftNavigationController, true);
                 }
                 else
                 {
@@ -163,11 +172,11 @@ namespace Xamarin.SideMenu
             {
                 if (_rightNavigationController?.PresentingViewController == null)
                 {
-                    removeMenuBlurForMenu(_rightNavigationController);
+                    RemoveMenuBlurForMenu(_rightNavigationController);
 
                     _rightNavigationController = value;
 
-                    setupNavigationController(_rightNavigationController, false);
+                    SetupNavigationController(_rightNavigationController, false);
                 }
                 else
                 {
@@ -177,7 +186,7 @@ namespace Xamarin.SideMenu
             }
         }
 
-        private void setupNavigationController(UISideMenuNavigationController forMenu, bool leftSide)
+		void SetupNavigationController(UISideMenuNavigationController forMenu, bool leftSide)
         {
             if (forMenu == null)
                 return;
@@ -196,21 +205,21 @@ namespace Xamarin.SideMenu
             {
                 RightSwipeToDismissGesture = exitPanGesture;
             }
-            updateMenuBlurIfNecessary();
+            UpdateMenuBlurIfNecessary();
         }
 
-        private void updateMenuBlurIfNecessary()
+		void UpdateMenuBlurIfNecessary()
         {
             if (LeftNavigationController != null)
-                setupMenuBlurForMenu(LeftNavigationController);
+                SetupMenuBlurForMenu(LeftNavigationController);
 
             if (RightNavigationController != null)
-                setupMenuBlurForMenu(RightNavigationController);
+                SetupMenuBlurForMenu(RightNavigationController);
         }
 
-        private void setupMenuBlurForMenu(UISideMenuNavigationController forMenu)
+		void SetupMenuBlurForMenu(UISideMenuNavigationController forMenu)
         {
-            removeMenuBlurForMenu(forMenu);
+			RemoveMenuBlurForMenu(forMenu);
 
             var view = forMenu.VisibleViewController?.View;
 
@@ -226,7 +235,10 @@ namespace Xamarin.SideMenu
                 forMenu.OriginalMenuBackgroundColor = view.BackgroundColor;
             }
 
-            var blurEffect = UIBlurEffect.FromStyle(BlurEffectStyle);
+			if (!BlurEffectStyle.HasValue)
+				return;
+
+            var blurEffect = UIBlurEffect.FromStyle(BlurEffectStyle.Value);
             var blurView = new UIVisualEffectView(blurEffect);
             view.BackgroundColor = UIColor.Clear;
             var tableViewController = forMenu.VisibleViewController as UITableViewController;
@@ -244,7 +256,7 @@ namespace Xamarin.SideMenu
             }
         }
 
-        private void removeMenuBlurForMenu(UISideMenuNavigationController forMenu)
+        void RemoveMenuBlurForMenu(UISideMenuNavigationController forMenu)
         {
             if (forMenu == null)
                 return;
