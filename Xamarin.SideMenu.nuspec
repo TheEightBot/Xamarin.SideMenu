@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Xamarin.SideMenu</id>
+    <title>SideMenu port for Xamarin.iOS</title>
+    <version>1.0</version>
+    <authors>Eight-Bot Inc.</authors>
+    <owners>Eight-Bot Inc.</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Elegant Side Menu for Xamarin.iOS</description>
+    <copyright>Copyright © Eight-Bot Corporation</copyright>
+    <projectUrl>https://github.com/TheEightBot/Xamarin.SideMenu</projectUrl>
+    <licenseUrl>https://github.com/TheEightBot/Xamarin.SideMenu/blob/master/LICENSE.md</licenseUrl>
+    <iconUrl>https://github.com/TheEightBot/Xamarin.SideMenu/raw/master/icon.png</iconUrl>
+    <tags>SideMenu, Flyout Menu, Menu, Xamarin, iOS</tags>
+	<releaseNotes>Initial Release</releaseNotes>
+  </metadata>
+  <files>
+    <!-- iOS Unified -->
+    <file src="Xamarin.SideMenu/bin/Release/Xamarin.SideMenu.dll" target="lib/Xamarin.iOS10" />
+  </files>
+</package>

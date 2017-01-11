@@ -40,3 +40,5 @@ Thumbs.db
 *.dotCover
 
 .droidres/.xamarin.sidemenu.droidres.db
+
+*.nupkg
