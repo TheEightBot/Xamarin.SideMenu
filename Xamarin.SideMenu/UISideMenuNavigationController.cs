@@ -150,16 +150,16 @@ namespace Xamarin.SideMenu
                 return;
             }
 
-			UINavigationController presentingViewController = null;
+	    UINavigationController presentingViewController = null;
 
-			if (PresentingViewController is UINavigationController)
-			{
-				presentingViewController = PresentingViewController as UINavigationController;
-			}
-			else if (PresentingViewController is UITabBarController)
-			{
-				presentingViewController = ((UITabBarController)PresentingViewController).SelectedViewController as UINavigationController;
-			}
+	    if (PresentingViewController is UINavigationController)
+	    {
+	    	presentingViewController = PresentingViewController as UINavigationController;
+	    }
+	    else if (PresentingViewController is UITabBarController)
+	    {
+	    	presentingViewController = ((UITabBarController)PresentingViewController).SelectedViewController as UINavigationController;
+	    }
 			
             if (presentingViewController == null)
             {
